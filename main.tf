@@ -1,18 +1,16 @@
 locals {
   db_subnet_group_name          = "${coalesce(var.db_subnet_group_name, module.db_subnet_group.this_db_subnet_group_id)}"
-  enable_create_db_subnet_group = "${var.db_subnet_group_name == "" ? var.create_db_subnet_group : 0}"
 
   parameter_group_name    = "${coalesce(var.parameter_group_name, var.identifier)}"
   parameter_group_name_id = "${coalesce(var.parameter_group_name, module.db_parameter_group.this_db_parameter_group_id)}"
 
   option_group_name             = "${coalesce(var.option_group_name, module.db_option_group.this_db_option_group_id)}"
-  enable_create_db_option_group = "${var.option_group_name == "" && var.engine != "postgres" ? var.create_db_option_group : 0}"
 }
 
 module "db_subnet_group" {
   source = "./modules/db_subnet_group"
 
-  create      = "${local.enable_create_db_subnet_group}"
+  create      = "${var.create_db_subnet_group}"
   identifier  = "${var.identifier}"
   name_prefix = "${var.identifier}-"
   subnet_ids  = ["${var.subnet_ids}"]
@@ -39,7 +37,7 @@ module "db_parameter_group" {
 module "db_option_group" {
   source = "./modules/db_option_group"
 
-  create                   = "${local.enable_create_db_option_group}"
+  create                   = "${var.create_db_option_group}"
   identifier               = "${var.identifier}"
   name_prefix              = "${var.identifier}-"
   option_group_description = "${var.option_group_description}"
